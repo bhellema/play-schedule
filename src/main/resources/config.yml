@@ -1,0 +1,8 @@
+schedule:
+    users:
+        The_Star_Fish:
+          - 600:800
+          - 1000:1100
+        The_Indian_Chief:
+          - 600:800
+          - 1000:2300

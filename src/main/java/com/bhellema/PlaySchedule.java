@@ -17,6 +17,9 @@ package com.bhellema;
     along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import com.bhellema.command.AddTimeToScheduleCommand;
+import com.bhellema.command.ScheduleCommandExecutor;
+import com.bhellema.config.PluginConfigReader;
 import com.bhellema.event.TimeExpiredEvent;
 import com.bhellema.listener.PlayerLoginListener;
 import com.bhellema.listener.TimeEventListener;
@@ -31,36 +34,26 @@ import java.util.Set;
 
 public class PlaySchedule extends JavaPlugin {
 
-
-	private final PlayScheduleCommandExecutor commandExecutor = new PlayScheduleCommandExecutor(this);
-	private final Listener eventListener = new PlayScheduleEventListener(this);
-
 	public void onDisable() {
         getLogger().info("onDisable has been invoked!");
 	}
 
 	public void onEnable() {
-        new PlayerLoginListener(this);
-        new TimeEventListener(this);
-
         getLogger().info("onEnable has been invoked!");
 
 		PluginManager pm = this.getServer().getPluginManager();
 
-		getCommand("command").setExecutor(commandExecutor);
-
-		// you can register multiple classes to handle events if you want
-		// just call pm.registerEvents() on an instance of each class
-		pm.registerEvents(eventListener, this);
-
-        callEvent();
+        registerCommands();
+        registerListeners();
 	}
 
-    private void callEvent() {
-
-        TimeExpiredEvent event = new TimeExpiredEvent("Time has expired");
-        Bukkit.getServer().getPluginManager().callEvent(event);
-        Bukkit.getServer().broadcastMessage(event.getMessage());
-
+    private void registerListeners() {
+        new PlayerLoginListener(this);
+        new TimeEventListener(this);
     }
+
+    private void registerCommands() {
+        getCommand("schedule").setExecutor(new ScheduleCommandExecutor(this));
+    }
+
 }

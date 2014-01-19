@@ -1,14 +1,36 @@
 package com.bhellema.listener;
 
 import com.bhellema.PlaySchedule;
+import com.bhellema.event.TimeExpiredEvent;
+import com.bhellema.schedule.Time;
+import com.bhellema.schedule.task.PlayerTask;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.scoreboard.DisplaySlot;
+import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.Score;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.ScoreboardManager;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class PlayerLoginListener implements Listener {
 
+    private static final int TICK = 20;
     private PlaySchedule plugin;
+
+    Map<String, Integer> tasks = new HashMap<String, Integer>();
 
     public PlayerLoginListener(PlaySchedule plugin) {
         this.plugin = plugin;
@@ -16,14 +38,45 @@ public class PlayerLoginListener implements Listener {
     }
 
     @EventHandler
-    public void onPlayerLogin(PlayerLoginEvent event) {
-        plugin.getLogger().info("normal priority player has logged in! " + event.getPlayer().getName());
+    public void onPlayerLogin(final PlayerLoginEvent event) {
+        final Scoreboard board = event.getPlayer().getScoreboard();
+        Objective objective = board.getObjective("Time");
+        if (objective == null) {
+            objective = board.registerNewObjective("Time", "Time Remaining");
+        }
+        objective.setDisplayName(ChatColor.GRAY + "Time Remaining");
+        objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+
+        final Score score = objective.getScore(Bukkit.getOfflinePlayer(event.getPlayer().getName()));
+        score.setScore(10);
+
+        int taskId = plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, new BukkitRunnable() {
+            @Override
+            public void run() {
+                int currentScore = score.getScore();
+                if (currentScore > 0) {
+                    currentScore--;
+                    score.setScore(currentScore);
+                } else {
+                    TimeExpiredEvent timeExpiredEvent = new TimeExpiredEvent(event.getPlayer(), "Time has expired");
+                    Bukkit.getServer().getPluginManager().callEvent(timeExpiredEvent);
+
+                    int taskId = tasks.get(event.getPlayer().getName());
+
+                    plugin.getServer().getScheduler().cancelTask(taskId);
+                    //Bukkit.getServer().broadcastMessage(event.getMessage());
+                }
+
+            }
+        }, 0, Time.ONE_SECOND);
+
+        tasks.put(event.getPlayer().getName(), taskId);
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
-    public void highLogin(PlayerLoginEvent event) {
-        plugin.getLogger().info("high priority player has logged in! " + event.getPlayer().getName());
-
+    @EventHandler
+    public void onPlayerLogout(PlayerQuitEvent event) {
+        int taskId = tasks.get(event.getPlayer().getName());
+        System.out.println("Shutting down player listener... " + taskId + " for player " + event.getPlayer().getName());
+        plugin.getServer().getScheduler().cancelTask(taskId);
     }
-
 }

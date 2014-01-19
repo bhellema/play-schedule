@@ -15,8 +15,8 @@ public class TimeEventListener implements Listener {
     }
 
     @EventHandler
-    public void onPlayerLogin(TimeExpiredEvent event) {
-        plugin.getLogger().info("Time has expired!");
+    public void onTimeExpired(TimeExpiredEvent event) {
+        event.getPlayer().kickPlayer("Sorry your time is up");
     }
 
 }

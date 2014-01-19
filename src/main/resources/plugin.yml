@@ -1,8 +1,21 @@
-name: PlaySchedule
+name: schedule
 main: com.bhellema.PlaySchedule
 version: 0.1
+author: The_Indian_Chief
+database: false
+prefix: schedule
 
 commands:
-   command:
-      description: A Command
-      usage: /<command> 
+   schedule:
+      aliases: [sc]
+      description: Creates a schedule for a player
+      usage: /<command> <show|hud|help>
+
+permissions:
+  schedule.show:
+      description: Shows the schedule for a player
+      default: op
+  schedule.hud:
+      description: Shows the time hud
+      default: op
+

@@ -1,21 +1,27 @@
 package com.bhellema.event;
 
+import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public class TimeExpiredEvent extends Event implements Cancellable {
+public class TimeExpiredEvent extends Event {
 
     private static final HandlerList handlers = new HandlerList();
     private String message;
-    private boolean isCancelled = false;
+    private Player player;
 
-    public TimeExpiredEvent(String example) {
-        message = example;
+    public TimeExpiredEvent(Player player, String message) {
+        this.message = message;
+        this.player = player;
     }
 
     public String getMessage() {
         return message;
+    }
+
+    public Player getPlayer() {
+        return player;
     }
 
     public static HandlerList getHandlerList() {
@@ -27,13 +33,5 @@ public class TimeExpiredEvent extends Event implements Cancellable {
         return handlers;
     }
 
-    @Override
-    public boolean isCancelled() {
-        return this.isCancelled;
-    }
 
-    @Override
-    public void setCancelled(boolean isCancelled) {
-        this.isCancelled = isCancelled;
-    }
 }
