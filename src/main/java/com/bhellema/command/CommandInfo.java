@@ -47,4 +47,30 @@ public class CommandInfo {
     public String getAlias() {
         return alias;
     }
+
+    /**
+     * sendMessage will direct a message to the player that issued
+     * the command, or if it was sent via the console it will
+     * direct the message back to the console.
+     *
+     * @param msg the message
+     */
+    public void sendMessage(String msg) {
+        if (isPlayerCommand()) {
+            getPlayer().sendMessage(msg);
+        } else { // ConsoleCommandSender
+            commandSender.sendMessage(msg);
+        }
+    }
+
+    /**
+     * Check to see if the caller has permission to invoke the command
+     * @return
+     */
+    public boolean hasPermission(String command) {
+        if (isPlayerCommand()) {
+            return (getPlayer().hasPermission(command) && !getPlayer().isOp());
+        }
+        return true;
+    }
 }

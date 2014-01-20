@@ -1,9 +1,9 @@
-name: schedule
+name: Schedule
 main: com.bhellema.PlaySchedule
 version: 0.1
 author: The_Indian_Chief
 database: false
-prefix: schedule
+prefix: Schedule
 
 commands:
    schedule:
