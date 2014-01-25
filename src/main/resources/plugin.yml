@@ -9,7 +9,12 @@ commands:
    schedule:
       aliases: [sc]
       description: Creates a schedule for a player
-      usage: /<command> <show|hud|help>
+      usage: |
+         Usage:
+            /<command> - Display help
+            /<command> show
+            /<command> hud [on|off] displays the hud or hides the hud
+            /<command> help
 
 permissions:
   schedule.show:

@@ -16,7 +16,7 @@ public class TimeEventListener implements Listener {
 
     @EventHandler
     public void onTimeExpired(TimeExpiredEvent event) {
-        event.getPlayer().kickPlayer("Sorry your time is up");
+        //event.getPlayer().kickPlayer("Sorry your time is up");
     }
 
 }

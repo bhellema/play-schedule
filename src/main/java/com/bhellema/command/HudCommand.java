@@ -1,6 +1,9 @@
 package com.bhellema.command;
 
+import com.bhellema.command.help.CommandHelpMessage;
+import com.bhellema.command.help.CommandHelpProvider;
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.scoreboard.DisplaySlot;
@@ -8,10 +11,12 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 
-public class HudCommand extends BaseCommand {
+public class HudCommand extends BaseCommand implements CommandHelpProvider {
 
-    public static final String NAME = "hud";
-    public static final String[] OPTIONS = {"on", "off"};
+    public static final String ON = "on";
+    public static final String OFF = "off";
+
+    public static final String[] OPTIONS = {ON,OFF};
 
     public HudCommand(CommandInfo info) {
         super(info);
@@ -19,8 +24,8 @@ public class HudCommand extends BaseCommand {
 
     @Override
     public boolean isValid() {
-        return  (    info.getArgs().length == 2
-                  && ArrayUtils.contains(OPTIONS, info.getArgs()[1]));
+        return (    info.getArgs().length == 2
+                 && ArrayUtils.contains(OPTIONS, info.getArgs()[1]));
     }
 
     @Override
@@ -28,10 +33,10 @@ public class HudCommand extends BaseCommand {
         String cmd = info.getArgs()[1];
 
         Scoreboard board = info.getPlayer().getScoreboard();
-        if ("off".equals(cmd)) {
+        if (OFF.equals(cmd)) {
             board.getObjective("Time").unregister();
             return true;
-        } else if ("on".equals(cmd)) {
+        } else if (ON.equals(cmd)) {
             Objective objective = board.getObjective("Time");
             if (objective == null) {
                 objective = board.registerNewObjective("Time", "Time Remaining");
@@ -41,8 +46,16 @@ public class HudCommand extends BaseCommand {
                 score.setScore(100);
             }
             return true;
+        } else {
+            return displayHelp();
         }
-        return false;
     }
 
+    @Override
+    public boolean displayHelp() {
+        String msg =  "hud <" + StringUtils.join(OPTIONS, "|") + ">";
+        CommandHelpMessage helpMessage = new CommandHelpMessage(info, msg);
+        helpMessage.displayHelp();
+        return true;
+    }
 }
