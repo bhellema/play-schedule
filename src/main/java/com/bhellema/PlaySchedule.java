@@ -3,6 +3,7 @@ package com.bhellema;
 import com.bhellema.command.ScheduleCommandExecutor;
 import com.bhellema.listener.PlayerLoginListener;
 import com.bhellema.listener.TimeEventListener;
+import com.bhellema.schedule.Scheduler;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class PlaySchedule extends JavaPlugin {
@@ -16,7 +17,13 @@ public class PlaySchedule extends JavaPlugin {
 
         registerCommands();
         registerListeners();
+        buildSchedule();
 	}
+
+    private void buildSchedule() {
+        Scheduler scheduler = new Scheduler(this);
+        scheduler.build();
+    }
 
     private void registerCommands() {
         getCommand("schedule").setExecutor(new ScheduleCommandExecutor(this));

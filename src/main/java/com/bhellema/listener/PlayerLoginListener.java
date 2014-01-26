@@ -2,7 +2,7 @@ package com.bhellema.listener;
 
 import com.bhellema.PlaySchedule;
 import com.bhellema.event.TimeExpiredEvent;
-import com.bhellema.schedule.Time;
+import com.bhellema.util.Time;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;

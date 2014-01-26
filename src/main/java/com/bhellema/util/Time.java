@@ -1,4 +1,4 @@
-package com.bhellema.schedule;
+package com.bhellema.util;
 
 public final class Time {
     public static final long ONE_SECOND  = (1 * 20);

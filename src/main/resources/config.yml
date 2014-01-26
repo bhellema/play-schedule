@@ -1,8 +1,13 @@
 schedule:
     users:
-        The_Star_Fish:
-          - 600:800
-          - 1000:1100
-        The_Indian_Chief:
-          - 600:800
-          - 1000:2300
+       - The_Star_Fish:
+          - 1/06:00/08:00  # sunday
+          - 2/10:00/11:00  # monday
+          - 3/13:00/14:00  # tuesday
+          - 4/14:00/15:00  # wednesday
+          - 5/15:00/18:00  # thursday
+          - 6/16:00/19:00  # friday
+          - 7/17:00/20:00  # saturday
+       - The_Indian_Chief:
+          - 1/09:00/08:00
+          - 1/11:00/23:00
