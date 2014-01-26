@@ -1,14 +1,11 @@
 package com.bhellema.schedule;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.time.DateUtils;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.TimeZone;
 
 /**
  * The PlayEntry is a single entry in the ScheduleConfig.  For
@@ -33,41 +30,48 @@ public class PlayEntry {
     private Date startTime;
     private Date endTime;
 
-    public PlayEntry(String entry) {
-        String[] e = StringUtils.split(entry, "/");
+    public PlayEntry(String entry) throws PlayEntryException {
+        String[] args = StringUtils.split(entry, "/");
 
-        if (e == null || e.length != 3) {
+        if (args == null || args.length != 3) {
             throw new IllegalArgumentException("Play Entries must be in the format of day:0000:0000");
         }
 
         SimpleDateFormat sdf = new SimpleDateFormat("h:m");
-        this.day = Integer.parseInt(e[0]);
+        this.day = Integer.parseInt(args[0]);
 
-        Date s = null;
-        Date f = null;
         try {
-            s = sdf.parse(e[1]);
-            f = sdf.parse(e[2]);
-        } catch (ParseException e1) {
-            e1.printStackTrace();
+            startTime = getDate(this.day, sdf.parse(args[1]));
+            endTime = getDate(this.day, sdf.parse(args[2]));
+        } catch (ParseException e) {
+            throw new PlayEntryException("Unable to parse the date", e);
         }
-
-        startTime = getDate(this.day, s);
-        endTime = getDate(this.day, f);
     }
 
-    private Date getDate(int day, Date time) {
+    private Date getDate(int dayOfWeek, Date time) {
         Calendar now = Calendar.getInstance();
 
-        int nowDay = now.get(Calendar.DAY_OF_WEEK);
-        int nextDate = 0;
-        if (day <= nowDay) {
-            nextDate = now.get(Calendar.DATE) + day;
+        int nowDayOfWeek = now.get(Calendar.DAY_OF_WEEK);
+        if (dayOfWeek != nowDayOfWeek) {
+            int daysOffset;
+            // if today being Wednesday but the scedule day is Tuesday
+            // we have to roll over to next week
+            if (dayOfWeek < nowDayOfWeek) {
+                daysOffset = 7 - nowDayOfWeek + dayOfWeek;
+            } else {
+                // if today is Saturday and tomorrow (dayOfWeek) is Sunday
+                daysOffset = dayOfWeek - nowDayOfWeek;
+            }
+            now.add(Calendar.DATE, daysOffset);
         }
 
-        now.set(Calendar.DATE, nextDate);
-        now.set(Calendar.HOUR_OF_DAY, time.getHours());
-        now.set(Calendar.MINUTE, time.getMinutes());
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(time);
+        int hours = calendar.get(Calendar.HOUR_OF_DAY);
+        int minute = calendar.get(Calendar.MINUTE);
+
+        now.set(Calendar.HOUR_OF_DAY, hours);
+        now.set(Calendar.MINUTE, minute);
         now.set(Calendar.SECOND, 0);
 
         return now.getTime();
@@ -83,5 +87,11 @@ public class PlayEntry {
 
     public String toString() {
         return startTime.toString() + " - " + endTime.toString();
+    }
+
+    private class PlayEntryException extends RuntimeException {
+        public PlayEntryException(String s, ParseException e) {
+            super(s, e);
+        }
     }
 }
