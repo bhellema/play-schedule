@@ -1,6 +1,5 @@
 package com.bhellema.schedule;
 
-import org.apache.commons.lang.StringUtils;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.ArrayList;
@@ -17,7 +16,6 @@ public class ScheduleConfigReader {
     public ScheduleConfigReader(FileConfiguration config) {
         this.config = config;
         this.schedules = new ArrayList<PlayerSchedule>();
-
         read();
     }
 
@@ -26,6 +24,7 @@ public class ScheduleConfigReader {
         Iterator<?> userIterator = users.iterator();
 
         while (userIterator.hasNext()) {
+
             Map userEntry = (Map) userIterator.next();
             Set userKeys = userEntry.keySet();
             Iterator userNameIterator = userKeys.iterator();
@@ -36,15 +35,16 @@ public class ScheduleConfigReader {
 
                 List<String> entries = (ArrayList) userEntry.get(playerName);
                 for (String entry : entries) {
-                    PlayEntry playEntry = new PlayEntry(entry);
-                    System.out.println(playerName + " " + playEntry.toString());
+                    ScheduleEntry scheduleEntry = new ScheduleEntry(entry);
+                    playerSchedule.addEntry(scheduleEntry);
                 }
+
+                schedules.add(playerSchedule);
             }
         }
     }
 
-    public List<PlayerSchedule> getPlayerSchedules() {
+    public List<PlayerSchedule> getSchedules() {
         return schedules;
     }
-
 }

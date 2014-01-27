@@ -1,6 +1,7 @@
 package com.bhellema;
 
 import com.bhellema.command.ScheduleCommandExecutor;
+import com.bhellema.hud.PlayerBoard;
 import com.bhellema.listener.PlayerLoginListener;
 import com.bhellema.listener.TimeEventListener;
 import com.bhellema.schedule.Scheduler;
@@ -8,7 +9,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class PlaySchedule extends JavaPlugin {
 
-	public void onDisable() {
+    private Scheduler scheduler;
+    private PlayerBoard playerBoard;
+
+    public void onDisable() {
         getLogger().info("onDisable has been invoked!");
 	}
 
@@ -18,10 +22,20 @@ public class PlaySchedule extends JavaPlugin {
         registerCommands();
         registerListeners();
         buildSchedule();
+
+        playerBoard = new PlayerBoard();
 	}
 
+    public PlayerBoard getPlayerBoard() {
+        return playerBoard;
+    }
+
+    /**
+     * Parse the schedule config and build a player
+     * schedule.
+     */
     private void buildSchedule() {
-        Scheduler scheduler = new Scheduler(this);
+        scheduler = new Scheduler(this);
         scheduler.build();
     }
 
@@ -34,4 +48,13 @@ public class PlaySchedule extends JavaPlugin {
         new TimeEventListener(this);
     }
 
+    /**
+     * Return a Scheduler that contains the schedules for
+     * different players.
+     *
+     * @return the scheduler.
+     */
+    public Scheduler getScheduler() {
+        return this.scheduler;
+    }
 }

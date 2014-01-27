@@ -8,7 +8,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 /**
- * The PlayEntry is a single entry in the ScheduleConfig.  For
+ * The ScheduleEntry is a single entry in the ScheduleConfig.  For
  * example a entry is in the format of day:startHour:endHour.
  *
  * The day is the first argument.  The value is one of the days
@@ -24,13 +24,13 @@ import java.util.Date;
  *       7:0800:0900   // allow only Saturday from 8:00 AM to 9:00 AM
  *       8:0600:7050   // allow every day from 6:00 AM to 7:50 AM
  */
-public class PlayEntry {
+public class ScheduleEntry {
 
     private int day;
     private Date startTime;
     private Date endTime;
 
-    public PlayEntry(String entry) throws PlayEntryException {
+    public ScheduleEntry(String entry) throws PlayEntryException {
         String[] args = StringUtils.split(entry, "/");
 
         if (args == null || args.length != 3) {
@@ -38,7 +38,12 @@ public class PlayEntry {
         }
 
         SimpleDateFormat sdf = new SimpleDateFormat("h:m");
+
         this.day = Integer.parseInt(args[0]);
+
+        if (this.day > Calendar.DAY_OF_WEEK || this.day < Calendar.SUNDAY) {
+            throw new IllegalArgumentException("Invalid day range " + entry);
+        }
 
         try {
             startTime = getDate(this.day, sdf.parse(args[1]));
