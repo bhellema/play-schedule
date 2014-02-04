@@ -8,8 +8,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.PlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.DisplaySlot;
@@ -22,32 +25,36 @@ import java.util.Map;
 
 public class PlayerLoginListener implements Listener {
 
-    private static final int TICK = 20;
     private PlaySchedule plugin;
-
-    Map<String, Integer> tasks = new HashMap<String, Integer>();
 
     public PlayerLoginListener(PlaySchedule plugin) {
         this.plugin = plugin;
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
-    @EventHandler
-    public void onPlayerLogin(final PlayerLoginEvent event) {
-        Player player = event.getPlayer();
-        PlayerSchedule playerSchedule = plugin.getScheduler().getPlayerSchedule(player);
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onPlayerLogin(final AsyncPlayerPreLoginEvent event) {
+        String name = event.getName();
+        PlayerSchedule playerSchedule = plugin.getScheduler().getPlayerSchedule(name);
         if (playerSchedule != null) {
-            this.plugin.getPlayerBoard().addPlayerToBoard(playerSchedule);
+            if (playerSchedule.canPlayToday()) {
+                this.plugin.getPlayerBoard().addPlayerToBoard(playerSchedule);
+            } else {
+                String msg = ChatColor.YELLOW + "\nYou're Not Scheduled To Play\n" +
+                        ChatColor.BLUE + "-------------------------------------\n" +
+                        ChatColor.GREEN + "Next Play Time\n" +
+                        ChatColor.GREEN + playerSchedule.getNextPlayTime().getTime().toString() +"\n" +
+                        ChatColor.BLUE + "-------------------------------------";
+                event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, msg);
+            }
         } else {
             // no schedule setup for player allow them free play :)
         }
 
     }
 
-    @EventHandler
+    /*@EventHandler
     public void onPlayerLogout(PlayerQuitEvent event) {
-        int taskId = tasks.get(event.getPlayer().getName());
-        System.out.println("Shutting down player listener... " + taskId + " for player " + event.getPlayer().getName());
-        plugin.getServer().getScheduler().cancelTask(taskId);
-    }
+        // nothing to do here yet...
+    }*/
 }

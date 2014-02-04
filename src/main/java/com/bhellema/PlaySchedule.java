@@ -1,7 +1,7 @@
 package com.bhellema;
 
 import com.bhellema.command.ScheduleCommandExecutor;
-import com.bhellema.hud.PlayerBoard;
+import com.bhellema.scoreboard.PlayerBoard;
 import com.bhellema.listener.PlayerLoginListener;
 import com.bhellema.listener.TimeEventListener;
 import com.bhellema.schedule.Scheduler;

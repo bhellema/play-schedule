@@ -1,7 +1,6 @@
 package com.bhellema.schedule;
 
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.HashMap;
@@ -36,18 +35,17 @@ public class Scheduler {
     /**
      * Return the player's schedule if one exists.  If no schedule
      * exists for the specified player then null is returned.
-     * @param player the player to retrieve the schedule for.
+     * @param player the name of the player to retrieve the schedule for.
      * @return the player's schedule.
      * @throws ScheduleException if the schedule has not been initialized.
      */
-    public PlayerSchedule getPlayerSchedule(Player player) throws ScheduleException {
+    public PlayerSchedule getPlayerSchedule(String player) throws ScheduleException {
         if (playerSchedules == null) {
             throw new ScheduleException("The schedules have not been built yet");
         }
 
-        if (playerSchedules.containsKey(player.getName())) {
-            PlayerSchedule playerSchedule = playerSchedules.get(player.getName());
-            playerSchedule.setPlayer(player);
+        if (playerSchedules.containsKey(player)) {
+            PlayerSchedule playerSchedule = playerSchedules.get(player);
             return playerSchedule;
         }
         return null;

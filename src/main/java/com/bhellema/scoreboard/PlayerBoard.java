@@ -1,4 +1,4 @@
-package com.bhellema.hud;
+package com.bhellema.scoreboard;
 
 import com.bhellema.schedule.PlayerSchedule;
 import org.bukkit.Bukkit;
@@ -12,7 +12,7 @@ import org.bukkit.scoreboard.Scoreboard;
 public class PlayerBoard {
 
     public void addPlayerToBoard(PlayerSchedule playerSchedule) {
-        Player player = playerSchedule.getPlayer();
+        Player player = Bukkit.getPlayer(playerSchedule.getPlayerName());
         final Scoreboard scoreboard = player.getScoreboard();
         Objective timeObjective = scoreboard.getObjective("Play Time");
         if (timeObjective == null) {

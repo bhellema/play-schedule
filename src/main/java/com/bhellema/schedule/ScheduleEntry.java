@@ -1,5 +1,6 @@
 package com.bhellema.schedule;
 
+import net.minecraft.util.org.apache.commons.lang3.time.DateUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.text.ParseException;
@@ -24,11 +25,11 @@ import java.util.Date;
  *       7:0800:0900   // allow only Saturday from 8:00 AM to 9:00 AM
  *       8:0600:7050   // allow every day from 6:00 AM to 7:50 AM
  */
-public class ScheduleEntry {
+public class ScheduleEntry implements Comparable {
 
     private int day;
-    private Date startTime;
-    private Date endTime;
+    private Calendar startTime;
+    private Calendar endTime;
 
     public ScheduleEntry(String entry) throws PlayEntryException {
         String[] args = StringUtils.split(entry, "/");
@@ -53,8 +54,11 @@ public class ScheduleEntry {
         }
     }
 
-    private Date getDate(int dayOfWeek, Date time) {
+    private Calendar getDate(int dayOfWeek, Date time) {
         Calendar now = Calendar.getInstance();
+
+        Calendar scheduled = Calendar.getInstance();
+        scheduled.setTime(time);
 
         int nowDayOfWeek = now.get(Calendar.DAY_OF_WEEK);
         if (dayOfWeek != nowDayOfWeek) {
@@ -68,30 +72,41 @@ public class ScheduleEntry {
                 daysOffset = dayOfWeek - nowDayOfWeek;
             }
             now.add(Calendar.DATE, daysOffset);
+        } else {
+            // if we have the same day we need to check to see if we've already passed our play time
+            if (DateUtils.truncatedCompareTo(now, scheduled, Calendar.MILLISECOND) == 1) {
+                now.add(Calendar.DATE, 7);
+            }
         }
 
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(time);
-        int hours = calendar.get(Calendar.HOUR_OF_DAY);
-        int minute = calendar.get(Calendar.MINUTE);
+
+        int hours = scheduled.get(Calendar.HOUR_OF_DAY);
+        int minute = scheduled.get(Calendar.MINUTE);
 
         now.set(Calendar.HOUR_OF_DAY, hours);
         now.set(Calendar.MINUTE, minute);
         now.set(Calendar.SECOND, 0);
 
-        return now.getTime();
+        return now;
     }
 
-    public Date getStartTime() {
+    public Calendar getStartTime() {
         return startTime;
     }
 
-    public Date getEndTime() {
+    public Calendar getEndTime() {
         return endTime;
     }
 
     public String toString() {
         return startTime.toString() + " - " + endTime.toString();
+    }
+
+    @Override
+    public int compareTo(Object entry) {
+        ScheduleEntry sEntry = (ScheduleEntry) entry;
+        Calendar s1 = sEntry.getStartTime();
+        return startTime.compareTo(s1);
     }
 
     private class PlayEntryException extends RuntimeException {

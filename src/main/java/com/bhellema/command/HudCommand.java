@@ -34,12 +34,12 @@ public class HudCommand extends BaseCommand implements CommandHelpProvider {
 
         Scoreboard board = info.getPlayer().getScoreboard();
         if (OFF.equals(cmd)) {
-            board.getObjective("Time").unregister();
+            board.getObjective("Play Time").unregister();
             return true;
         } else if (ON.equals(cmd)) {
-            Objective objective = board.getObjective("Time");
+            Objective objective = board.getObjective("Play Time");
             if (objective == null) {
-                objective = board.registerNewObjective("Time", "Time Remaining");
+                objective = board.registerNewObjective("Play Time", "Time Remaining");
                 objective.setDisplayName(ChatColor.GRAY + "Time Remaining");
                 objective.setDisplaySlot(DisplaySlot.SIDEBAR);
                 Score score = objective.getScore(Bukkit.getOfflinePlayer(info.getPlayer().getName()));
