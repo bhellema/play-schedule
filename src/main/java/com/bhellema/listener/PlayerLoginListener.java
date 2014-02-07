@@ -1,27 +1,15 @@
 package com.bhellema.listener;
 
 import com.bhellema.PlaySchedule;
-import com.bhellema.event.TimeExpiredEvent;
 import com.bhellema.schedule.PlayerSchedule;
-import com.bhellema.util.Time;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
-import org.bukkit.event.player.PlayerPreLoginEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scoreboard.DisplaySlot;
-import org.bukkit.scoreboard.Objective;
-import org.bukkit.scoreboard.Score;
-import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.event.player.PlayerJoinEvent;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.text.SimpleDateFormat;
 
 public class PlayerLoginListener implements Listener {
 
@@ -33,24 +21,28 @@ public class PlayerLoginListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onPlayerLogin(final AsyncPlayerPreLoginEvent event) {
+    public void onPlayerPreLogin(final AsyncPlayerPreLoginEvent event) {
         String name = event.getName();
         PlayerSchedule playerSchedule = plugin.getScheduler().getPlayerSchedule(name);
         if (playerSchedule != null) {
-            if (playerSchedule.canPlayToday()) {
-                this.plugin.getPlayerBoard().addPlayerToBoard(playerSchedule);
-            } else {
+            if (!playerSchedule.canPlayToday()) {
+                SimpleDateFormat df = new SimpleDateFormat("MMM, EEEE, d h:mm a");
+                String result = df.format(playerSchedule.getNextPlayTime().getTime());
                 String msg = ChatColor.YELLOW + "\nYou're Not Scheduled To Play\n" +
                         ChatColor.BLUE + "-------------------------------------\n" +
                         ChatColor.GREEN + "Next Play Time\n" +
-                        ChatColor.GREEN + playerSchedule.getNextPlayTime().getTime().toString() +"\n" +
+                        ChatColor.GREEN + result +"\n" +
                         ChatColor.BLUE + "-------------------------------------";
                 event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, msg);
             }
-        } else {
-            // no schedule setup for player allow them free play :)
         }
+    }
 
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onPlayerLogin(final PlayerJoinEvent event) {
+        String name = event.getPlayer().getDisplayName();
+        PlayerSchedule playerSchedule = plugin.getScheduler().getPlayerSchedule(name);
+        this.plugin.getPlayerBoard().addPlayerToBoard(playerSchedule);
     }
 
     /*@EventHandler
