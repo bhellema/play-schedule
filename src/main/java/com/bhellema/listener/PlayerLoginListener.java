@@ -8,6 +8,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.scoreboard.Objective;
 
 import java.text.SimpleDateFormat;
 
@@ -25,7 +27,7 @@ public class PlayerLoginListener implements Listener {
         String name = event.getName();
         PlayerSchedule playerSchedule = plugin.getScheduler().getPlayerSchedule(name);
         if (playerSchedule != null) {
-            if (!playerSchedule.canPlayToday()) {
+            if (!playerSchedule.canPlayNow()) {
                 SimpleDateFormat df = new SimpleDateFormat("MMM, EEEE, d h:mm a");
                 String result = df.format(playerSchedule.getNextPlayTime().getTime());
                 String msg = ChatColor.YELLOW + "\nYou're Not Scheduled To Play\n" +
@@ -39,14 +41,22 @@ public class PlayerLoginListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onPlayerLogin(final PlayerJoinEvent event) {
+    public void onPlayerJoinLogin(final PlayerJoinEvent event) {
         String name = event.getPlayer().getDisplayName();
         PlayerSchedule playerSchedule = plugin.getScheduler().getPlayerSchedule(name);
-        this.plugin.getPlayerBoard().addPlayerToBoard(playerSchedule);
+        if (playerSchedule != null) {
+            plugin.getScheduler().schedulePlayer(name);
+            //this.plugin.getPlayerBoard().addPlayerToBoard(playerSchedule);
+        } else {
+            for (Objective objective : event.getPlayer().getScoreboard().getObjectives()) {
+                objective.unregister();
+            }
+        }
     }
 
-    /*@EventHandler
+    @EventHandler
     public void onPlayerLogout(PlayerQuitEvent event) {
-        // nothing to do here yet...
-    }*/
+        //this.plugin.getPlayerBoard().removePlayerFromBoard(event.getPlayer().getDisplayName());
+        plugin.getScheduler().unschedulePlayer(event.getPlayer().getDisplayName());
+    }
 }

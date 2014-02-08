@@ -9,20 +9,47 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class PlayerBoard {
+
+    private Map<String, Player> playerBoards = new HashMap<String, Player>();
 
     public void addPlayerToBoard(PlayerSchedule playerSchedule) {
         Player player = Bukkit.getPlayer(playerSchedule.getPlayerName());
-        final Scoreboard scoreboard = player.getScoreboard();
-        Objective timeObjective = scoreboard.getObjective("Play Time");
+
+        /*final Scoreboard scoreboard = player.getScoreboard();
+        Objective timeObjective = scoreboard.getObjective("time");
         if (timeObjective == null) {
-            timeObjective = scoreboard.registerNewObjective("Play Time", "Time Remaining");
+            timeObjective = scoreboard.registerNewObjective("time", "Time Remaining");
         }
         timeObjective.setDisplayName(ChatColor.GRAY + "Time Remaining");
         timeObjective.setDisplaySlot(DisplaySlot.SIDEBAR);
+
+        playerBoards.put(player.getDisplayName(), player);
         final Score score = timeObjective.getScore(Bukkit.getOfflinePlayer(player.getName()));
-        score.setScore(9999);
+        startTimer(score);*/
     }
+
+   /* private String getTime(int time)
+    {
+        int seconds = time % 60;
+        int minutes = time / 60;
+        String message = "";
+        if(minutes == 1)
+            message = "1 " + lang.translate("minute");
+        else if(minutes > 1)
+            message = Integer.toString(minutes) + " " + lang.translate("minutes");
+        if(seconds == 1)
+            message += " 1 " + lang.translate("second");
+        else if(seconds > 1)
+            message += " " + Integer.toString(seconds) + " " + lang.translate("seconds");
+        message = message.trim();
+        return message;
+    }*/
 }
 
 /*

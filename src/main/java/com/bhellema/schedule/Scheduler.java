@@ -1,20 +1,28 @@
 package com.bhellema.schedule;
 
+import net.minecraft.util.org.apache.commons.lang3.time.DateUtils;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class Scheduler {
 
-    private Map<String, PlayerSchedule> playerSchedules = null;
+    private Map<String, PlayerSchedule> playerSchedules;
+    private Map<String, ScheduleTimer> scheduleTimers;
     private final JavaPlugin plugin;
 
+    /**
+     * Constructor.
+     * @param plugin
+     */
     public Scheduler(JavaPlugin plugin) {
         this.plugin = plugin;
         playerSchedules = new HashMap<String, PlayerSchedule>();
+        scheduleTimers = new HashMap<String, ScheduleTimer>();
     }
 
     /**
@@ -51,6 +59,29 @@ public class Scheduler {
         return null;
     }
 
+    /**
+     * Schedule a player to play right now.  Allow the player's
+     * Schedule determine when they have to stop.
+     * @param playerName the name of the player to start scheduling
+     *                   their play time.
+     */
+    public void schedulePlayer(String playerName) {
+        PlayerSchedule playerSchedule = getPlayerSchedule(playerName);
+        ScheduleTimer timer = new ScheduleTimer(playerSchedule);
+        scheduleTimers.put(playerName, timer);
+    }
+
+    /**
+     * Remove the specified player from the scheduler.  Unscheduling
+     * a player performs necessary cleanup for their schedule.
+     * @param playerName the name of the player to unschedule.
+     */
+    public void unschedulePlayer(String playerName) {
+        ScheduleTimer timer = scheduleTimers.remove(playerName);
+        if (timer != null) {
+            timer.cancel();
+        }
+    }
 
     /**
      * ScheduleException can occur if there's any issues with the

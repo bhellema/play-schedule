@@ -1,8 +1,5 @@
 package com.bhellema.schedule;
 
-import net.minecraft.util.org.apache.commons.lang3.time.DateUtils;
-import org.bukkit.entity.Player;
-
 import java.util.Calendar;
 import java.util.Iterator;
 import java.util.Set;
@@ -30,27 +27,18 @@ public class PlayerSchedule {
         return scheduleEntries.iterator();
     }
 
-    public boolean canPlayToday() {
-        Calendar now = Calendar.getInstance();
-        Iterator<ScheduleEntry> i = iterator();
-        int cnt = 0;
-        while (i.hasNext()) {
-            ScheduleEntry scheduleEntry = i.next();
-            int dayOfWeek = scheduleEntry.getDayOfWeek();
-            Calendar start = scheduleEntry.getStartTime();
-            Calendar end = scheduleEntry.getEndTime();
-            // if we have the same day of the week then we can check
-            // the time range
-            if (dayOfWeek == now.get(Calendar.DAY_OF_WEEK)) {
-                if (start.getTimeInMillis() < now.getTimeInMillis() && now.getTimeInMillis() < end.getTimeInMillis()) {
-                    return true;
-                }
-            }
-        }
-        return false;
+    /**
+     * Return true if the player can play right now.
+     * @return true if the player's allowed to play, false otherwise.
+     */
+    public boolean canPlayNow() {
+        return getCurrentScheduleEntry() == null ? false : true;
     }
 
-
+    /**
+     * Return the next schedule play time for the player.
+     * @return
+     */
     public Calendar getNextPlayTime() {
         Calendar current = Calendar.getInstance();
         int nowDayOfWeek = current.get(Calendar.DAY_OF_WEEK);
@@ -92,5 +80,30 @@ public class PlayerSchedule {
         current.set(Calendar.SECOND, 0);
         current.set(Calendar.MILLISECOND, 0);
         return current;
+    }
+
+    /**
+     * Returns the schedule entry for the player that allows
+     * them to play right now.
+     *
+     * @return the <code>ScheduleEntry</code> that allows the to play
+     * at the current time.
+     */
+    public ScheduleEntry getCurrentScheduleEntry() {
+        Calendar now = Calendar.getInstance();
+        Iterator<ScheduleEntry> i = iterator();
+        while (i.hasNext()) {
+            ScheduleEntry scheduleEntry = i.next();
+            int dayOfWeek = scheduleEntry.getDayOfWeek();
+            Calendar start = scheduleEntry.getStartTime();
+            Calendar end = scheduleEntry.getEndTime();
+            // if we have the same day of the week then we can check the time range
+            if (dayOfWeek == now.get(Calendar.DAY_OF_WEEK)) {
+                if (start.getTimeInMillis() < now.getTimeInMillis() && now.getTimeInMillis() < end.getTimeInMillis()) {
+                    return scheduleEntry;
+                }
+            }
+        }
+        return null;
     }
 }
